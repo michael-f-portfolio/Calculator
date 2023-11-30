@@ -1,5 +1,7 @@
 let calculation = "";
+let previousCalculation = null;
 let previousResult = null;
+let dividedByZero = false;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -69,6 +71,7 @@ function calculate() {
     let calculationArray = calculation.trim().split(" ");
 
     if (!isValidCalculation(calculationArray)) {
+        calculation = "";
         return "ERROR";
     }
 
@@ -83,16 +86,23 @@ function calculate() {
         } else if (isNumber(value)) {
             if (sum === null) {
                 sum = value;
-            } else if (sum !== null) {
+            } else {
                 rightNumber = value;
             }
         }
         if (currentOperator !== null &&
             sum !== null && 
             rightNumber !== null) {
+                
                 sum = operate(currentOperator, 
                               parseInt(sum), 
                               parseInt(rightNumber));
+                //
+                if (sum === Infinity || !isNumber(sum)) {
+                    calculation = "";
+                    dividedByZero = true;
+                    return "Cannot Divide by Zero";
+                }
                 currentOperator, rightNumber = null;
             }
     }
@@ -101,6 +111,7 @@ function calculate() {
         sum = parseFloat(sum).toFixed(3);
     }
     previousResult = sum;
+    previousCalculation = calculation;
     calculation = `${sum} `;
     return sum;
 }
@@ -110,14 +121,17 @@ function writeToDisplay(value) {
     if (value === "=") {
         let calculationResult = calculate();
         if (calculationResult === "ERROR") {
-            calculation = ""; 
             displayText = calculationResult;
-        } else {
-            displayText += ` = ${calculationResult}`;
+        } else if (dividedByZero) {
+            displayText = calculationResult;
+            dividedByZero = false;
+        }
+        else {
+            displayText = `${previousCalculation} = ${calculationResult}`;
         }
     } else if (value === "clear") {
         calculation = ""; 
-        display.textContent = "";
+        displayText = "";
         previousResult = null;
     } else if ((isOperator(value) || isNumber(value)) && 
                 appendToCalculation(value)) {
