@@ -1,9 +1,5 @@
 /* Structure */
 @media screen and (min-width: 1920px){
-    /* body {
-        background-color: black;
-    } */
-
     #calculator {
         width: 20vw;
         height: 32vw;
@@ -24,10 +20,6 @@
 }
 
 @media screen and (min-width: 1080px) and (max-width: 1919px){
-    /* body {
-        background-color: green;
-    } */
-
     #calculator {
         width: 20vw;
         height: 33vw;
@@ -48,10 +40,6 @@
 }
 
 @media screen and (min-width: 600px) and (max-width: 1080px){
-    /* body {
-        background-color: blue;
-    } */
-
     #calculator {
         width: 40vw;
         height: 65vw;
@@ -133,10 +121,6 @@ body {
 }
 
 /* Styling */
-body {
-    
-}
-
 #calculator {
     background-color: #323232;
     color: #dbdbdb;
