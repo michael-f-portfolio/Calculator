@@ -1,3 +1,15 @@
+/* 
+ * Calculator Application 
+ * Based on the following Odin Project Assignment: 
+ * https://www.theodinproject.com/lessons/foundations-calculator
+ * 
+ * Responsive calculator application which allows the user to Add, Subtract, Multiply and Divide.
+ * Features include: 
+ * Responsive
+ * Error handling for erroneous operations 
+ * 
+ */
+
 let calculation = "";
 let previousCalculation = null;
 let previousResult = null;
@@ -97,7 +109,6 @@ function calculate() {
                 sum = operate(currentOperator, 
                               parseInt(sum), 
                               parseInt(rightNumber));
-                //
                 if (sum === Infinity || !isNumber(sum)) {
                     calculation = "";
                     dividedByZero = true;
@@ -117,7 +128,9 @@ function calculate() {
 }
 
 function writeToDisplay(value) {
+    let displayElement = document.querySelector("#calculation-display");
     let displayText;
+    displayElement.style.fontSize = "";
     if (value === "=") {
         let calculationResult = calculate();
         if (calculationResult === "ERROR") {
@@ -127,17 +140,62 @@ function writeToDisplay(value) {
             dividedByZero = false;
         }
         else {
-            displayText = `${previousCalculation} = ${calculationResult}`;
+            displayText = `${calculationResult}`;
         }
     } else if (value === "clear") {
         calculation = ""; 
-        displayText = "";
+        displayText = "0";
         previousResult = null;
     } else if ((isOperator(value) || isNumber(value)) && 
                 appendToCalculation(value)) {
         displayText = calculation;
     }
-    document.querySelector("#display").textContent = displayText;
+    displayElement.textContent = displayText;
+    checkAndSetDisplayFontSize(displayElement);
+}
+
+function checkAndSetDisplayFontSize() {
+    let displayElement = document.querySelector("#calculation-display");
+    while (displayOverflowsContainer(displayElement)) {
+        shrinkDisplayFontSize(displayElement);
+    }
+}
+
+function shrinkDisplayFontSize(displayElement) {
+    let currentFontSize = displayElement.style.fontSize; 
+    if (currentFontSize === "") {
+        displayElement.style.fontSize = "90%";
+    } else if (currentFontSize === "90%") {
+        displayElement.style.fontSize = "80%";
+    } else if (currentFontSize === "80%") {
+        displayElement.style.fontSize = "70%";
+    } else if (currentFontSize === "70%") {
+        displayElement.style.fontSize = "60%";
+    } else if (currentFontSize === "60%") {
+        displayElement.style.fontSize = "50%";
+    } else if (currentFontSize === "50%") {
+        displayElement.style.fontSize = "40%";
+    } else if (currentFontSize === "40%") {
+        displayElement.style.fontSize = "30%";
+    } else if (currentFontSize === "30%") {
+        displayElement.style.fontSize = "20%";
+    } else if (currentFontSize === "20%") {
+        displayElement.style.fontSize = "10%";
+    }   
+}
+
+function displayOverflowsContainer(displayElement) {
+    let displayTextWidth = displayElement.clientWidth;
+    let displayContainerWidth = displayElement.parentElement.clientWidth;
+    let doesTextOverflowsContainer = displayTextWidth > displayContainerWidth;
+    if (displayElement.style.fontSize === "10%") {
+        return false;
+    }
+    else if (doesTextOverflowsContainer) {
+        return true;
+    } else {
+        return false
+    }
 }
 
 function isValidCalculation(calculationArray) {
@@ -204,6 +262,8 @@ function addCalculatorEvents() {
     document.querySelector("#clear")
             .addEventListener("click", () => writeToDisplay("clear"));
 }
+
+window.onresize = checkAndSetDisplayFontSize;
 
 function initialize() {
     addCalculatorEvents();
