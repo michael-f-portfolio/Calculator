@@ -10,33 +10,44 @@
 <body>
     <div id="calculator">
         <div id="display">
+            <span id="calculation-display">0</span>
         </div>
-            <div class="input">
-                <div id="operators">
-                    <div class="button" id="add-operator">+</div>
-                    <div class="button" id="subtract-operator">-</div>
-                    <div class="button" id="multiply-operator">*</div>
-                    <div class="button" id="divide-operator">/</div>
+            <div id="input">
+                <div class="buttons">
+                    <div class="button not-implemented">%</div>
+                    <div class="button"></div>
+                    <div class="button action" id="clear">C</div>
+                    <div class="button not-implemented">⌫</div>
                 </div>
-                <div class="numbers">
-                    <div class="button" id="number-seven">7</div>
-                    <div class="button" id="number-eight">8</div>
-                    <div class="button" id="number-nine">9</div>
+                <div class="buttons">
+                    <div class="button not-implemented">x²</div>
+                    <div class="button"></div>
+                    <div class="button"></div>
+                    <div class="button action" id="divide-operator">/</div>
                 </div>
-                <div class="numbers">
-                    <div class="button" id="number-four">4</div>
-                    <div class="button" id="number-five">5</div>
-                    <div class="button" id="number-six">6</div>
+                <div class="buttons">
+                    <div class="button number" id="number-seven">7</div>
+                    <div class="button number" id="number-eight">8</div>
+                    <div class="button number" id="number-nine">9</div>
+                    <div class="button action" id="multiply-operator">*</div>
                 </div>
-                <div class="numbers">
-                    <div class="button" id="number-one">1</div>
-                    <div class="button" id="number-two">2</div>
-                    <div class="button" id="number-three">3</div>
+                <div class="buttons">
+                    <div class="button number" id="number-four">4</div>
+                    <div class="button number" id="number-five">5</div>
+                    <div class="button number" id="number-six">6</div>
+                    <div class="button action" id="subtract-operator">-</div>
                 </div>
-                <div class="numbers">
-                    <div class="button" id="number-zero">0</div>
-                    <div class="button" id="equals">=</div>
-                    <div class="button" id="clear">C</div>
+                <div class="buttons">
+                    <div class="button number" id="number-one">1</div>
+                    <div class="button number" id="number-two">2</div>
+                    <div class="button number" id="number-three">3</div>
+                    <div class="button action" id="add-operator">+</div>
+                </div>
+                <div class="buttons">
+                    <div class="button not-implemented">+/-</div>
+                    <div class="button number" id="number-zero">0</div>
+                    <div class="button not-implemented">.</div>
+                    <div class="button action" id="equals">=</div>
                 </div>
             </div>
         </div>
