@@ -10,20 +10,37 @@
  * 
  * 
  * TODO:
- * Bug: text doesn't get bigger if it's been shrunk
+ * Add a message when attempting to divide by zero.
+ * Implement Memory Store and Memory Clear functions which...
+ *      Will store the current value in the input display by pressing "MS".
+ *      Will input the stored value into input display by pressing "MR".
+ *      "Clear" will not remove the stored value.
+ * Implement "Backspace" which will allow removal of previously inputted digit in input display.
+ * Implement "Square" function which will square the value in the input display.
+ * Implement "Square Root" function which will take the square root of the value in the input display.
+ * Implement "Modulus" function which will return the remainder of a division function.
+ * Implement "+/-" function allowing the value in the input display to be inverted (123 into -123).
+ * Implement "." function which will allow decimals to be added to the number in the input display.
+ * Implement ability to use keyboard to input values.
+ * 
+ * BUGS:
+ * Resizing the window while a large value is in either the input display or calculation display can cause 
+ * the text to go out of bounds of it's container.
  */
-const DECIMAL_MAX_LENGTH = 9;
+const DECIMAL_MAX_LENGTH = 16;
 const RESULT_MAX_LENGTH = 21;
+const numberFormat = {
+    maximumFractionDigits: DECIMAL_MAX_LENGTH
+}
 
 // Short Calc Variables
 let leftValue = null;
+let originalLeftValue = null;
 let operator = null;
 let rightValue = null;
 
 // Other Variables
-let dividedByZero = false;
 let appendToValue = false;
-
 
 function add(num1, num2) {
     return num1 + num2;
@@ -62,43 +79,58 @@ function resetCalculator() {
     leftValue = null;
     operator = null;
     rightValue = null;
+    originalLeftValue = null;
     appendToValue = false;
-    return "0";
 }
 
-function calculate() {
+function calculate(operator, leftValue, rightValue) {
     let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue));
-    if (result % 1 !== 0) {
-        result = result.toFixed(DECIMAL_MAX_LENGTH);
-    }
     return result;
 }
 
 function writeToDisplay(value) {
     let inputDisplay = document.querySelector("#input-display");
     let inputDisplayText = inputDisplay.textContent;
+    let newInputDisplayText = inputDisplayText;
+    let calculationDisplay = document.querySelector("#calculation-display");
+    let calculationDisplayText = calculationDisplay.textContent;
+    let newCalculationDisplayText = calculationDisplayText;
     let result;
     try {
         if (value === "=" && leftValue !== null && 
-            operator !== null && rightValue !== null) {
-            result = calculate();
+            operator !== null ) {
+            if (rightValue !== null) {
+                result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));
+                newCalculationDisplayText = `${leftValue} ${operator} ${rightValue} =`;
+            } else {
+                if (originalLeftValue === null) {
+                    originalLeftValue = leftValue;
+                }
+                result = calculate(operator, parseFloat(leftValue), parseFloat(originalLeftValue));
+                newCalculationDisplayText = `${leftValue} ${operator} ${originalLeftValue} =`;
+            }
+            if (`${result}`.includes("e")) {
+                newInputDisplayText = `${result}`;
+            } else {
+                newInputDisplayText = result.toLocaleString("en-US", numberFormat);
+            }
             leftValue = `${result}`;
-            rightValue = null;
-            operator = null;
             appendToValue = false;
-            inputDisplayText = result;
         } else if (value === "clear") {
-            inputDisplayText = resetCalculator();
+            resetCalculator();
+            newInputDisplayText = "0";
+            newCalculationDisplayText = ""; 
         } else if (isOperator(value)) {
             if (leftValue !== null && rightValue != null) {
-                result = calculate();
+                result = calculate(operator, leftValue, rightValue);
                 leftValue = `${result}`;
                 rightValue = null;
                 operator = value;
-                inputDisplayText = `${result} ${value} `;
+                newCalculationDisplayText = `${result} ${value} `;
+                newInputDisplayText = `${parseFloat(result).toLocaleString("en-US", numberFormat)}`;
             } else if (leftValue !== null) {
                 operator = `${value}`;
-                inputDisplayText = `${leftValue} ${operator} `;
+                newCalculationDisplayText = `${leftValue} ${operator}`;
             } 
         } else if (isNumber(value)) {
             if (operator === null) {
@@ -108,27 +140,39 @@ function writeToDisplay(value) {
                     leftValue = value;
                     appendToValue = true;
                 }
-                inputDisplayText = leftValue;
+                newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", numberFormat);
             } else {
                 if (rightValue === null) {
                     rightValue = value;
                 } else {
                     rightValue = `${rightValue}${value}`;
                 }
-                inputDisplayText = `${leftValue} ${operator} ${rightValue}`;
+                newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", numberFormat);
             }
         }
     } catch (e) {
-        inputDisplayText = resetCalculator();
+        newInputDisplayText = resetCalculator();
+        newInputDisplayText = e;
+        newCalculationDisplayText = ""; 
     }
-    inputDisplay.textContent = inputDisplayText;
+    inputDisplay.textContent = newInputDisplayText;
+    calculationDisplay.textContent = newCalculationDisplayText;
     checkAndSetDisplayFontSize();
 }
 
 function checkAndSetDisplayFontSize() {
     let inputDisplay = document.querySelector("#input-display");
+    let calculationDisplay = document.querySelector("#calculator-display");
+
+    inputDisplay.style.fontSize = "";
     while (displayOverflowsContainer(inputDisplay)) {
         shrinkDisplayFontSize(inputDisplay);
+    }
+    if (calculationDisplay !== null) {
+        calculationDisplay.style.fontSize = "";
+        while (displayOverflowsContainer(calculationDisplay)) {
+            shrinkDisplayFontSize(calculationDisplay);
+        }
     }
 }
 
@@ -144,8 +188,14 @@ function displayOverflowsContainer(displayElement) {
 function shrinkDisplayFontSize(displayElement) {
     let currentFontSize = displayElement.style.fontSize; 
     if (currentFontSize === "") {
-        displayElement.style.fontSize = "90%";
-    } else if (currentFontSize === "90%") {
+        displayElement.style.fontSize = "200%";
+    } else if (currentFontSize === "200%") {
+        displayElement.style.fontSize = "180%";
+    } else if (currentFontSize === "180%") {
+        displayElement.style.fontSize = "150%";
+    } else if (currentFontSize === "150%") {
+        displayElement.style.fontSize = "110%";
+    } else if (currentFontSize === "110%") {
         displayElement.style.fontSize = "80%";
     } else if (currentFontSize === "80%") {
         displayElement.style.fontSize = "70%";
@@ -215,8 +265,6 @@ function addCalculatorEvents() {
 
 function initialize() {
     addCalculatorEvents();
-    window.onresize = checkAndSetDisplayFontSize;
-
 }
 
 initialize();
