@@ -10,6 +10,15 @@
         height: 5vw;
         margin-top: 1vw;
         font-size: 4vw;
+        gap: 0.5vw;
+    }
+
+    #calculation-display {
+        font-size: 1.25vw;
+    }
+
+    #input-display {
+        font-size: 2.5vw;
     }
 
     .button {
@@ -29,7 +38,15 @@
         width: 18vw;
         height: 5vw;
         margin-top: 1vw;
-        font-size: 4vw;
+        gap: .25vw;
+    }
+
+    #calculation-display {
+        font-size: 1.5vw;
+    }
+
+    #input-display {
+        font-size: 3vw;
     }
 
     .button {
@@ -50,6 +67,15 @@
         height: 10vw;
         margin-top: 2vw;
         font-size: 6vw;
+        gap: .5vw;
+    }
+
+    #calculation-display {
+        font-size: 3vw;
+    }
+
+    #input-display {
+        font-size: 6vw;
     }
 
     .button {
@@ -69,7 +95,15 @@
         width: 70vw;
         height: 20vw;
         margin-top: 2vw;
-        font-size: 16vw;
+        gap: 2vw;
+    }
+
+    #calculation-display {
+        font-size: 5vw;
+    }
+
+    #input-display {
+        font-size: 10vw;
     }
 
     .button {
@@ -95,8 +129,9 @@ body {
 
 #display {
     display: flex;
+    flex-direction: column;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
 }
 
 #input {
