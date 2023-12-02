@@ -5,15 +5,25 @@
  * 
  * Responsive calculator application which allows the user to Add, Subtract, Multiply and Divide.
  * Features include: 
- * Responsive
+ * Responsiveness
  * Error handling for erroneous operations 
  * 
+ * 
+ * TODO:
+ * Bug: text doesn't get bigger if it's been shrunk
  */
+const DECIMAL_MAX_LENGTH = 9;
+const RESULT_MAX_LENGTH = 21;
 
-let calculation = "";
-let previousCalculation = null;
-let previousResult = null;
+// Short Calc Variables
+let leftValue = null;
+let operator = null;
+let rightValue = null;
+
+// Other Variables
 let dividedByZero = false;
+let appendToValue = false;
+
 
 function add(num1, num2) {
     return num1 + num2;
@@ -48,117 +58,87 @@ function operate(operator, num1, num2) {
     return result;
 }
 
-function appendToCalculation(value) {
-    // Don't allow starting calculation with an operator
-    if (calculation === "" && isOperator(value)) {
-        return false;
-    }
-    // Don't allow repeating operators
-    // Instead, overwrite last operator
-    let calculationArray = calculation.trim().split(" ");
-    let calcArrayLastItem = calculationArray.at(calculationArray.length - 1);
-    if (isOperator(calcArrayLastItem) && isOperator(value)) {
-        let lastOperator = calculation.lastIndexOf(calcArrayLastItem);
-        calculation = calculation.substring(0, lastOperator) + `${value} `;
-        return true;
-    }
-    if (previousResult === null) {
-        if (isOperator(value)) {
-            calculation += ` ${value} `;
-        } else if (isNumber(value)) {
-            calculation += value;
-        }
-    } else {
-        if (isOperator(value)) {
-            calculation = `${previousResult} ${value} `;
-        } else if (isNumber(value)) {
-            calculation = `${value}`;
-        }
-        previousResult = null;
-    }
-    return true;
+function resetCalculator() {
+    leftValue = null;
+    operator = null;
+    rightValue = null;
+    appendToValue = false;
+    return "0";
 }
 
 function calculate() {
-    let calculationArray = calculation.trim().split(" ");
-
-    if (!isValidCalculation(calculationArray)) {
-        calculation = "";
-        return "ERROR";
+    let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue));
+    if (result % 1 !== 0) {
+        result = result.toFixed(DECIMAL_MAX_LENGTH);
     }
-
-    let currentOperator = null;
-    let rightNumber = null;
-    let sum = null;
-
-    for(let i = 0; i < calculationArray.length; i++) {
-        let value = calculationArray[i];
-        if(isOperator(value)) {
-            currentOperator = value;
-        } else if (isNumber(value)) {
-            if (sum === null) {
-                sum = value;
-            } else {
-                rightNumber = value;
-            }
-        }
-        if (currentOperator !== null &&
-            sum !== null && 
-            rightNumber !== null) {
-                
-                sum = operate(currentOperator, 
-                              parseInt(sum), 
-                              parseInt(rightNumber));
-                if (sum === Infinity || !isNumber(sum)) {
-                    calculation = "";
-                    dividedByZero = true;
-                    return "Cannot Divide by Zero";
-                }
-                currentOperator, rightNumber = null;
-            }
-    }
-    // If value has remainder show to 3 decimal place.
-    if (sum % 1 !== 0) {
-        sum = parseFloat(sum).toFixed(3);
-    }
-    previousResult = sum;
-    previousCalculation = calculation;
-    calculation = `${sum} `;
-    return sum;
+    return result;
 }
 
 function writeToDisplay(value) {
-    let displayElement = document.querySelector("#calculation-display");
-    let displayText;
-    displayElement.style.fontSize = "";
-    if (value === "=") {
-        let calculationResult = calculate();
-        if (calculationResult === "ERROR") {
-            displayText = calculationResult;
-        } else if (dividedByZero) {
-            displayText = calculationResult;
-            dividedByZero = false;
+    let inputDisplay = document.querySelector("#input-display");
+    let inputDisplayText = inputDisplay.textContent;
+    let result;
+    try {
+        if (value === "=" && leftValue !== null && 
+            operator !== null && rightValue !== null) {
+            result = calculate();
+            leftValue = `${result}`;
+            rightValue = null;
+            operator = null;
+            appendToValue = false;
+            inputDisplayText = result;
+        } else if (value === "clear") {
+            inputDisplayText = resetCalculator();
+        } else if (isOperator(value)) {
+            if (leftValue !== null && rightValue != null) {
+                result = calculate();
+                leftValue = `${result}`;
+                rightValue = null;
+                operator = value;
+                inputDisplayText = `${result} ${value} `;
+            } else if (leftValue !== null) {
+                operator = `${value}`;
+                inputDisplayText = `${leftValue} ${operator} `;
+            } 
+        } else if (isNumber(value)) {
+            if (operator === null) {
+                if (appendToValue) {
+                    leftValue = `${leftValue}${value}`
+                } else {
+                    leftValue = value;
+                    appendToValue = true;
+                }
+                inputDisplayText = leftValue;
+            } else {
+                if (rightValue === null) {
+                    rightValue = value;
+                } else {
+                    rightValue = `${rightValue}${value}`;
+                }
+                inputDisplayText = `${leftValue} ${operator} ${rightValue}`;
+            }
         }
-        else {
-            displayText = `${calculationResult}`;
-        }
-    } else if (value === "clear") {
-        calculation = ""; 
-        displayText = "0";
-        previousResult = null;
-    } else if ((isOperator(value) || isNumber(value)) && 
-                appendToCalculation(value)) {
-        displayText = calculation;
+    } catch (e) {
+        inputDisplayText = resetCalculator();
     }
-    displayElement.textContent = displayText;
-    checkAndSetDisplayFontSize(displayElement);
+    inputDisplay.textContent = inputDisplayText;
+    checkAndSetDisplayFontSize();
 }
 
 function checkAndSetDisplayFontSize() {
-    let displayElement = document.querySelector("#calculation-display");
-    while (displayOverflowsContainer(displayElement)) {
-        shrinkDisplayFontSize(displayElement);
+    let inputDisplay = document.querySelector("#input-display");
+    while (displayOverflowsContainer(inputDisplay)) {
+        shrinkDisplayFontSize(inputDisplay);
     }
+}
+
+function displayOverflowsContainer(displayElement) {
+    let displayTextWidth = displayElement.clientWidth;
+    let displayContainerWidth = displayElement.parentElement.clientWidth;
+    if (displayElement.style.fontSize === "10%") {
+        return false;
+    }
+    return displayTextWidth > displayContainerWidth;
 }
 
 function shrinkDisplayFontSize(displayElement) {
@@ -184,36 +164,6 @@ function shrinkDisplayFontSize(displayElement) {
     }   
 }
 
-function displayOverflowsContainer(displayElement) {
-    let displayTextWidth = displayElement.clientWidth;
-    let displayContainerWidth = displayElement.parentElement.clientWidth;
-    let doesTextOverflowsContainer = displayTextWidth > displayContainerWidth;
-    if (displayElement.style.fontSize === "10%") {
-        return false;
-    }
-    else if (doesTextOverflowsContainer) {
-        return true;
-    } else {
-        return false
-    }
-}
-
-function isValidCalculation(calculationArray) {
-    // Calculation is not empty
-    if (calculationArray.at(0) === "") {
-        return false;
-    }
-    // Calculation does not end with an operator
-    if (isOperator(calculationArray.at(calculationArray.length - 1))) {
-        return false;
-    }
-    // Calculation contains an operator 
-    if (!calculationArray.some(value => {return isOperator(value)})) {
-        return false;
-    }
-    return true;
-}
-
 function isOperator(value) {
     return value === "+" || 
            value === "-" || 
@@ -237,25 +187,25 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("/"));
     // Numbers
     document.querySelector("#number-one")
-            .addEventListener("click", () => writeToDisplay(1));
+            .addEventListener("click", () => writeToDisplay("1"));
     document.querySelector("#number-two")
-            .addEventListener("click", () => writeToDisplay(2));
+            .addEventListener("click", () => writeToDisplay("2"));
     document.querySelector("#number-three")
-            .addEventListener("click", () => writeToDisplay(3));
+            .addEventListener("click", () => writeToDisplay("3"));
     document.querySelector("#number-four")
-            .addEventListener("click", () => writeToDisplay(4));
+            .addEventListener("click", () => writeToDisplay("4"));
     document.querySelector("#number-five")
-            .addEventListener("click", () => writeToDisplay(5));
+            .addEventListener("click", () => writeToDisplay("5"));
     document.querySelector("#number-six")
-            .addEventListener("click", () => writeToDisplay(6));
+            .addEventListener("click", () => writeToDisplay("6"));
     document.querySelector("#number-seven")
-            .addEventListener("click", () => writeToDisplay(7));
+            .addEventListener("click", () => writeToDisplay("7"));
     document.querySelector("#number-eight")
-            .addEventListener("click", () => writeToDisplay(8));
+            .addEventListener("click", () => writeToDisplay("8"));
     document.querySelector("#number-nine")
-            .addEventListener("click", () => writeToDisplay(9));
+            .addEventListener("click", () => writeToDisplay("9"));
     document.querySelector("#number-zero")
-            .addEventListener("click", () => writeToDisplay(0));
+            .addEventListener("click", () => writeToDisplay("0"));
     // Equals + Clear
     document.querySelector("#equals")
             .addEventListener("click", () => writeToDisplay("="));
@@ -263,10 +213,10 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("clear"));
 }
 
-window.onresize = checkAndSetDisplayFontSize;
-
 function initialize() {
     addCalculatorEvents();
+    window.onresize = checkAndSetDisplayFontSize;
+
 }
 
 initialize();
