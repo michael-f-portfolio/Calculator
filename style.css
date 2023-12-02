@@ -21,10 +21,15 @@
         font-size: 2.5vw;
     }
 
+    #input {
+        width: 18vw;
+    }
+
     .button {
         width: 4vw;
         height: 4vw;
         font-size: 2vw;
+        margin: .1vw;
     }
 }
 
@@ -42,17 +47,22 @@
     }
 
     #calculation-display {
-        font-size: 1.5vw;
+        font-size: 1vw;
     }
 
     #input-display {
         font-size: 3vw;
     }
 
+    #input {
+        width: 18vw;
+    }
+
     .button {
         width: 4vw;
         height: 4vw;
         font-size: 2vw;
+        margin: .1vw;
     }
 }
 
@@ -78,10 +88,15 @@
         font-size: 6vw;
     }
 
+    #input {
+        width: 35vw;
+    }
+
     .button {
         width: 8vw;
         height: 8vw;
         font-size: 4vw;
+        margin: .1vw;
     }
 }
 
@@ -106,10 +121,15 @@
         font-size: 10vw;
     }
 
+    #input {
+        width: 70vw;
+    }
+
     .button {
         width: 16vw;
         height: 16vw;
         font-size: 8vw;
+        margin: 0.1vw;
     }
 }
 
@@ -117,7 +137,6 @@ body {
     display: flex;
     justify-content: center;
     background-color: #b1aeab;
-
 }
 
 #calculator {
@@ -141,18 +160,17 @@ body {
 
 .buttons {
     display: flex;
+    justify-content: center;
 }
 
 .button {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1px;
 }
 
 .button.number, .button.action:hover {
     background-color: #525252;
-    
 }
 
 /* Styling */
