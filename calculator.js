@@ -19,20 +19,20 @@
  * Implement "Square" function which will square the value in the input display.
  * Implement "Square Root" function which will take the square root of the value in the input display.
  * Implement "Modulus" function which will return the remainder of a division function.
- * Implement "." function which will allow decimals to be added to the number in the input display.
  * Implement ability to use keyboard to input values.
  * 
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
  * the text to go out of bounds of it's container.
  */
+// Constants
 const DECIMAL_MAX_LENGTH = 16;
 const RESULT_MAX_LENGTH = 21;
-const numberFormat = {
-    maximumFractionDigits: DECIMAL_MAX_LENGTH
+const inputNumberFormat = {
+    maximumSignificantDigits: DECIMAL_MAX_LENGTH
 }
 
-// Short Calc Variables
+// Calculation Variables
 let leftValue = null;
 let originalLeftValue = null;
 let operator = null;
@@ -83,8 +83,16 @@ function resetCalculator() {
 }
 
 function calculate(operator, leftValue, rightValue) {
-    let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue));
-    return result;
+    let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue))
+    if (!`${result}`.includes(".")) {
+        return result;
+    } else {
+        if (decimalIsAtMostDecimalMaxLength(`${result}`) ) {
+            return result;
+        } else {
+            return parseFloat(result.toFixed(DECIMAL_MAX_LENGTH));
+        }
+    }
 }
 
 function writeToDisplay(value) {
@@ -96,9 +104,9 @@ function writeToDisplay(value) {
     let newCalculationDisplayText = calculationDisplayText;
     let result;
     try {
-        if (value === "=" && leftValue !== null && operator !== null ) {
+        if (value === "equals" && leftValue !== null && operator !== null ) {
             if (rightValue !== null) {
-                result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));
+                result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));   
                 newCalculationDisplayText = `${leftValue} ${operator} ${rightValue} =`;
             } else {
                 if (originalLeftValue === null) {
@@ -110,7 +118,7 @@ function writeToDisplay(value) {
             if (`${result}`.includes("e")) {
                 newInputDisplayText = `${result}`;
             } else {
-                newInputDisplayText = result.toLocaleString("en-US", numberFormat);
+                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
             }
             leftValue = `${result}`;
             appendToValue = false;
@@ -125,11 +133,30 @@ function writeToDisplay(value) {
                     originalLeftValue !== null) {
                 valueToInvert = parseFloat(leftValue);
                 leftValue = valueToInvert *= -1;
-                newInputDisplayText = leftValue.toLocaleString("en-US", numberFormat);
+                newInputDisplayText = leftValue.toLocaleString("en-US", inputNumberFormat);
             } else if (rightValue !== null) {
                 valueToInvert = parseFloat(rightValue); 
                 rightValue = valueToInvert *= -1;
-                newInputDisplayText = rightValue.toLocaleString("en-US", numberFormat);
+                newInputDisplayText = rightValue.toLocaleString("en-US", inputNumberFormat);
+            }
+        } else if (value === "append-decimal") {
+            if (operator === null) {
+                if (leftValue === null) {
+                    leftValue = "0.";
+                    appendToValue = true;
+                    newInputDisplayText = leftValue;
+                } else if (!leftValue.includes(".")) {
+                    leftValue = `${leftValue}.`;
+                    newInputDisplayText = `${parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat)}.` ;
+                }
+            } else {
+                if (rightValue === null) {
+                    rightValue = "0.";
+                    newInputDisplayText = rightValue;
+                } else if (!rightValue.includes(".")) {
+                    rightValue = `${rightValue}.`;
+                    newInputDisplayText = `${parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat)}.`;
+                }
             }
         } else if (isOperator(value)) {
             if (leftValue !== null && rightValue != null) {
@@ -138,7 +165,7 @@ function writeToDisplay(value) {
                 rightValue = null;
                 operator = value;
                 newCalculationDisplayText = `${result} ${value} `;
-                newInputDisplayText = `${parseFloat(result).toLocaleString("en-US", numberFormat)}`;
+                newInputDisplayText = `${parseFloat(result).toLocaleString("en-US", inputNumberFormat)}`;
             } else if (leftValue !== null) {
                 operator = `${value}`;
                 newCalculationDisplayText = `${leftValue} ${operator}`;
@@ -146,22 +173,44 @@ function writeToDisplay(value) {
         } else if (isNumber(value)) {
             if (operator === null) {
                 if (appendToValue) {
-                    leftValue = `${leftValue}${value}`
+                    if (leftValue.includes(".") && decimalIsAtMostDecimalMaxLength(leftValue)) {
+                        leftValue = `${leftValue}${value}`;                        
+                    } else if (!leftValue.includes(".")) {
+                        leftValue = `${leftValue}${value}`;                        
+                    }
                 } else if (value !== "0") {
                     leftValue = value;
                     appendToValue = true;
                 }
                 if (leftValue !== null) {
-                    newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", numberFormat);
+                    if (leftValue.includes(".")) {
+                        // Split and format int then append decimal back
+                        let intValue = leftValue.split(".").at(0);
+                        let decimalValue = leftValue.split(".").at(1);
+                        newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
+                    } else {
+                        newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
+                    }
                 }
             } else {
                 if (rightValue === null && value !== "0") {
                     rightValue = value;
                 } else if (rightValue !== null) {
-                    rightValue = `${rightValue}${value}`;
+                    if (rightValue.includes(".") && decimalIsAtMostDecimalMaxLength(rightValue)) {
+                        rightValue = `${rightValue}${value}`;                        
+                    } else if (!rightValue.includes(".")) {
+                        rightValue = `${rightValue}${value}`;                        
+                    }
                 }
                 if (rightValue !== null) {
-                    newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", numberFormat);
+                    if (rightValue.includes(".")) {
+                        // Split and format int then append decimal back
+                        let intValue = rightValue.split(".").at(0);
+                        let decimalValue = rightValue.split(".").at(1);
+                        newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
+                    } else {
+                        newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
+                    }
                 }
             }
         }
@@ -178,7 +227,6 @@ function writeToDisplay(value) {
 function checkAndSetDisplayFontSize() {
     let inputDisplay = document.querySelector("#input-display");
     let calculationDisplay = document.querySelector("#calculation-display");
-
     inputDisplay.style.fontSize = "";
     while (displayOverflowsContainer(inputDisplay)) {
         shrinkDisplayFontSize(inputDisplay);
@@ -229,6 +277,11 @@ function shrinkDisplayFontSize(displayElement) {
     }   
 }
 
+function decimalIsAtMostDecimalMaxLength(valueWithDecimal) {
+    let decimals = valueWithDecimal.split(".").at(1);
+    return decimals.length < DECIMAL_MAX_LENGTH;
+}
+
 function isOperator(value) {
     return value === "+" || 
            value === "-" || 
@@ -273,9 +326,11 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("0"));
     document.querySelector("#number-invert")
             .addEventListener("click", () => writeToDisplay("invert"));
+    document.querySelector("#number-decimal")
+            .addEventListener("click", () => writeToDisplay("append-decimal"));
     // Other
     document.querySelector("#equals")
-            .addEventListener("click", () => writeToDisplay("="));
+            .addEventListener("click", () => writeToDisplay("equals"));
     document.querySelector("#clear")
             .addEventListener("click", () => writeToDisplay("clear"));
     
