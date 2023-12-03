@@ -7,7 +7,8 @@
  * Features include: 
  * Responsiveness
  * Error handling for erroneous operations 
- * 
+ * Notes:
+ * Intentionally not using Math method for square and square root.
  * 
  * TODO:
  * Implement Memory Store and Memory Clear functions which...
@@ -59,6 +60,10 @@ function mod(num1, num2) {
     return num1 % num2;
 }
 
+function square(num1) {
+    return num1 * num1
+}
+
 function operate(operator, num1, num2) {
     let result;
     if (operator === "+") {
@@ -69,9 +74,15 @@ function operate(operator, num1, num2) {
         result = multiply(num1, num2);
     } else if (operator === "/") {
         result = divide(num1, num2);
+        if (result === Infinity || !isNumber(result)) 
+            throw "Cannot divide by zero";
     } else if (operator === "Mod") {
         result = mod(num1, num2);
-    }
+    } else if (operator === "square") {
+        result = square(num1);
+        if (result === Infinity || (hasResult && result === 0)) 
+            throw "Number out of bounds";
+    } 
     return result;
 }
 
@@ -85,12 +96,9 @@ function resetCalculator() {
 }
 
 function calculate(operator, leftValue, rightValue) {
-    let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue))
-    if (result === Infinity || !isNumber(result)) {
-        throw "Cannot divide by zero";
-    }
+    let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue));
     hasResult = true;
-    if (!`${result}`.includes(".")) {
+    if (!`${result}`.includes(".") || `${result}`.includes("e")) {
         return result;
     } else {
         if (decimalIsAtMostDecimalMaxLength(`${result}`) ) {
@@ -114,6 +122,7 @@ function writeToDisplay(value) {
             if (rightValue !== null) {
                 result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${rightValue} =`;
+                rightValue = null;
             } else {
                 if (originalLeftValue === null) {
                     originalLeftValue = leftValue;
@@ -128,6 +137,27 @@ function writeToDisplay(value) {
             }
             leftValue = `${result}`;
             appendToValue = false;
+        } else if (value === "square" && leftValue !== null) {
+            if (rightValue !== null) {
+                result = calculate(operator, leftValue, calculate(value, rightValue));
+                newCalculationDisplayText = `${leftValue} ${operator} sqr(${rightValue}) =`;
+                leftValue = `${result}`;
+                rightValue = null;
+                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+            } else {
+                if (originalLeftValue === null) {
+                    originalLeftValue = leftValue
+                }
+                result = calculate(value, leftValue);
+                leftValue = `${result}`;
+                appendToValue = false;
+                newCalculationDisplayText = `sqr(${originalLeftValue})`;
+                if (`${result}`.includes("e")) {
+                    newInputDisplayText = `${result}`;
+                } else {
+                    newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                }
+            }
         } else if (value === "remove-last-digit") {
             if (rightValue === null && leftValue !== null) {
                 leftValue = leftValue.slice(0, leftValue.length -1);
@@ -367,6 +397,8 @@ function addCalculatorEvents() {
     // Other
     document.querySelector("#equals")
             .addEventListener("click", () => writeToDisplay("equals"));
+    document.querySelector("#square")
+            .addEventListener("click", () => writeToDisplay("square"));
     document.querySelector("#clear")
             .addEventListener("click", () => writeToDisplay("clear"));
     document.querySelector("#backspace")
