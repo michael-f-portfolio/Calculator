@@ -15,7 +15,6 @@
  *      Will store the current value in the input display by pressing "MS".
  *      Will input the stored value into input display by pressing "MR".
  *      "Clear" will not remove the stored value.
- * Implement "Backspace" which will allow removal of previously inputted digit in input display.
  * Implement "Square" function which will square the value in the input display.
  * Implement "Square Root" function which will take the square root of the value in the input display.
  * Implement "Modulus" function which will return the remainder of a division function.
@@ -144,7 +143,7 @@ function writeToDisplay(value) {
                     newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
                 } else if (rightValue === "") {
                     newInputDisplayText = "0";
-                    rightValue = null;
+                    rightValue = "0";
                 }else {
                     newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
                 }
