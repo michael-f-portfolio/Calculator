@@ -19,7 +19,6 @@
  * Implement "Square" function which will square the value in the input display.
  * Implement "Square Root" function which will take the square root of the value in the input display.
  * Implement "Modulus" function which will return the remainder of a division function.
- * Implement "+/-" function allowing the value in the input display to be inverted (123 into -123).
  * Implement "." function which will allow decimals to be added to the number in the input display.
  * Implement ability to use keyboard to input values.
  * 
@@ -97,8 +96,7 @@ function writeToDisplay(value) {
     let newCalculationDisplayText = calculationDisplayText;
     let result;
     try {
-        if (value === "=" && leftValue !== null && 
-            operator !== null ) {
+        if (value === "=" && leftValue !== null && operator !== null ) {
             if (rightValue !== null) {
                 result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${rightValue} =`;
@@ -120,6 +118,19 @@ function writeToDisplay(value) {
             resetCalculator();
             newInputDisplayText = "0";
             newCalculationDisplayText = ""; 
+        } else if (value === "invert") {
+            let valueToInvert;
+            if ((leftValue !== null && operator === null) || 
+                    (rightValue !== null && appendToValue === false) ||
+                    originalLeftValue !== null) {
+                valueToInvert = parseFloat(leftValue);
+                leftValue = valueToInvert *= -1;
+                newInputDisplayText = leftValue.toLocaleString("en-US", numberFormat);
+            } else if (rightValue !== null) {
+                valueToInvert = parseFloat(rightValue); 
+                rightValue = valueToInvert *= -1;
+                newInputDisplayText = rightValue.toLocaleString("en-US", numberFormat);
+            }
         } else if (isOperator(value)) {
             if (leftValue !== null && rightValue != null) {
                 result = calculate(operator, leftValue, rightValue);
@@ -151,7 +162,7 @@ function writeToDisplay(value) {
             }
         }
     } catch (e) {
-        newInputDisplayText = resetCalculator();
+        resetCalculator();
         newInputDisplayText = e;
         newCalculationDisplayText = ""; 
     }
@@ -256,11 +267,14 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("9"));
     document.querySelector("#number-zero")
             .addEventListener("click", () => writeToDisplay("0"));
-    // Equals + Clear
+    document.querySelector("#number-invert")
+            .addEventListener("click", () => writeToDisplay("invert"));
+    // Other
     document.querySelector("#equals")
             .addEventListener("click", () => writeToDisplay("="));
     document.querySelector("#clear")
             .addEventListener("click", () => writeToDisplay("clear"));
+    
 }
 
 function initialize() {
