@@ -38,6 +38,7 @@ let rightValue = null;
 
 // Other Variables
 let appendToValue = false;
+let hasResult = false;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -78,10 +79,15 @@ function resetCalculator() {
     rightValue = null;
     originalLeftValue = null;
     appendToValue = false;
+    hasResult = false;
 }
 
 function calculate(operator, leftValue, rightValue) {
     let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue))
+    if (result === Infinity || !isNumber(result)) {
+        throw "Cannot divide by zero";
+    }
+    hasResult = true;
     if (!`${result}`.includes(".")) {
         return result;
     } else {
@@ -113,9 +119,6 @@ function writeToDisplay(value) {
                 result = calculate(operator, parseFloat(leftValue), parseFloat(originalLeftValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${originalLeftValue} =`;
             }
-            if (result === Infinity) {
-                throw "Cannot divide by zero";
-            }
             if (`${result}`.includes("e")) {
                 newInputDisplayText = `${result}`;
             } else {
@@ -137,7 +140,7 @@ function writeToDisplay(value) {
                  } else {
                     newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
                 }
-            } else if (rightValue !== null) {
+            } else if (rightValue !== null && !hasResult) {
                 rightValue = rightValue.slice(0, rightValue.length -1);
                 if (rightValue.includes(".")) {
                     let intValue = rightValue.split(".").at(0);
