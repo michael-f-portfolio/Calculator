@@ -10,7 +10,6 @@
  * 
  * 
  * TODO:
- * Add a message when attempting to divide by zero.
  * Implement Memory Store and Memory Clear functions which...
  *      Will store the current value in the input display by pressing "MS".
  *      Will input the stored value into input display by pressing "MR".
@@ -105,7 +104,7 @@ function writeToDisplay(value) {
     try {
         if (value === "equals" && leftValue !== null && operator !== null ) {
             if (rightValue !== null) {
-                result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));   
+                result = calculate(operator, parseFloat(leftValue), parseFloat(rightValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${rightValue} =`;
             } else {
                 if (originalLeftValue === null) {
@@ -113,6 +112,9 @@ function writeToDisplay(value) {
                 }
                 result = calculate(operator, parseFloat(leftValue), parseFloat(originalLeftValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${originalLeftValue} =`;
+            }
+            if (result === Infinity) {
+                throw "Cannot divide by zero";
             }
             if (`${result}`.includes("e")) {
                 newInputDisplayText = `${result}`;
@@ -128,11 +130,11 @@ function writeToDisplay(value) {
                     let intValue = leftValue.split(".").at(0);
                     let decimalValue = leftValue.split(".").at(1);
                     newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                } else if (leftValue === "") {
+                } else if (leftValue === "" || leftValue === "-") {
                     newInputDisplayText = "0";
                     leftValue = null;
                     appendToValue = false;
-                } else {
+                 } else {
                     newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
                 }
             } else if (rightValue !== null) {
@@ -141,7 +143,7 @@ function writeToDisplay(value) {
                     let intValue = rightValue.split(".").at(0);
                     let decimalValue = rightValue.split(".").at(1);
                     newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                } else if (rightValue === "") {
+                } else if (rightValue === "" || rightValue === "-") {
                     newInputDisplayText = "0";
                     rightValue = "0";
                 }else {
@@ -158,12 +160,12 @@ function writeToDisplay(value) {
                     (rightValue !== null && appendToValue === false) ||
                     originalLeftValue !== null) {
                 valueToInvert = parseFloat(leftValue);
-                leftValue = valueToInvert *= -1;
-                newInputDisplayText = leftValue.toLocaleString("en-US", inputNumberFormat);
+                leftValue = `${valueToInvert *= -1}`;
+                newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
             } else if (rightValue !== null) {
                 valueToInvert = parseFloat(rightValue); 
-                rightValue = valueToInvert *= -1;
-                newInputDisplayText = rightValue.toLocaleString("en-US", inputNumberFormat);
+                rightValue = `${valueToInvert *= -1}`;
+                newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
             }
         } else if (value === "append-decimal") {
             if (operator === null) {
