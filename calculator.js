@@ -15,7 +15,6 @@
  *      Will store the current value in the input display by pressing "MS".
  *      Will input the stored value into input display by pressing "MR".
  *      "Clear" will not remove the stored value.
- * Implement "Square" function which will square the value in the input display.
  * Implement "Square Root" function which will take the square root of the value in the input display.
  * Implement ability to use keyboard to input values.
  * Break up repetitive code blocks into their own functions DRY DRY DRY
