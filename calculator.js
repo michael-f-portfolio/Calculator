@@ -162,7 +162,7 @@ function writeToDisplay(value) {
 
 function checkAndSetDisplayFontSize() {
     let inputDisplay = document.querySelector("#input-display");
-    let calculationDisplay = document.querySelector("#calculator-display");
+    let calculationDisplay = document.querySelector("#calculation-display");
 
     inputDisplay.style.fontSize = "";
     while (displayOverflowsContainer(inputDisplay)) {
