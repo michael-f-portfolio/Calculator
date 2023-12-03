@@ -16,7 +16,6 @@
  *      "Clear" will not remove the stored value.
  * Implement "Square" function which will square the value in the input display.
  * Implement "Square Root" function which will take the square root of the value in the input display.
- * Implement "Modulus" function which will return the remainder of a division function.
  * Implement ability to use keyboard to input values.
  * Break up repetitive code blocks into their own functions DRY DRY DRY
  * BUGS:
@@ -56,19 +55,22 @@ function divide(num1, num2) {
     return num1 / num2;
 }
 
+function mod(num1, num2) {
+    return num1 % num2;
+}
+
 function operate(operator, num1, num2) {
     let result;
     if (operator === "+") {
         result = add(num1, num2);
-    }
-    if (operator === "-") {
+    } else if (operator === "-") {
         result = subtract(num1, num2);
-    }
-    if (operator === "*") {
+    } else if (operator === "*") {
         result = multiply(num1, num2);
-    }
-    if (operator === "/") {
+    } else if (operator === "/") {
         result = divide(num1, num2);
+    } else if (operator === "Mod") {
+        result = mod(num1, num2);
     }
     return result;
 }
@@ -317,7 +319,8 @@ function isOperator(value) {
     return value === "+" || 
            value === "-" || 
            value === "/" || 
-           value === "*";
+           value === "*" || 
+           value === "Mod";
 }
 
 function isNumber(value) {
@@ -334,6 +337,8 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("*"));
     document.querySelector("#divide-operator")
             .addEventListener("click", () => writeToDisplay("/"));
+    document.querySelector("#modulo")
+            .addEventListener("click", () => writeToDisplay("Mod"));
     // Numbers
     document.querySelector("#number-one")
             .addEventListener("click", () => writeToDisplay("1"));
