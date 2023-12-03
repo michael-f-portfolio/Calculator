@@ -147,18 +147,22 @@ function writeToDisplay(value) {
             if (operator === null) {
                 if (appendToValue) {
                     leftValue = `${leftValue}${value}`
-                } else {
+                } else if (value !== "0") {
                     leftValue = value;
                     appendToValue = true;
                 }
-                newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", numberFormat);
+                if (leftValue !== null) {
+                    newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", numberFormat);
+                }
             } else {
-                if (rightValue === null) {
+                if (rightValue === null && value !== "0") {
                     rightValue = value;
-                } else {
+                } else if (rightValue !== null) {
                     rightValue = `${rightValue}${value}`;
                 }
-                newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", numberFormat);
+                if (rightValue !== null) {
+                    newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", numberFormat);
+                }
             }
         }
     } catch (e) {
