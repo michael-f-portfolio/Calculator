@@ -20,7 +20,7 @@
  * Implement "Square Root" function which will take the square root of the value in the input display.
  * Implement "Modulus" function which will return the remainder of a division function.
  * Implement ability to use keyboard to input values.
- * 
+ * Break up repetitive code blocks into their own functions DRY DRY DRY
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
  * the text to go out of bounds of it's container.
@@ -122,6 +122,33 @@ function writeToDisplay(value) {
             }
             leftValue = `${result}`;
             appendToValue = false;
+        } else if (value === "remove-last-digit") {
+            if (rightValue === null && leftValue !== null) {
+                leftValue = leftValue.slice(0, leftValue.length -1);
+                if (leftValue.includes(".")) {
+                    let intValue = leftValue.split(".").at(0);
+                    let decimalValue = leftValue.split(".").at(1);
+                    newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
+                } else if (leftValue === "") {
+                    newInputDisplayText = "0";
+                    leftValue = null;
+                    appendToValue = false;
+                } else {
+                    newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
+                }
+            } else if (rightValue !== null) {
+                rightValue = rightValue.slice(0, rightValue.length -1);
+                if (rightValue.includes(".")) {
+                    let intValue = rightValue.split(".").at(0);
+                    let decimalValue = rightValue.split(".").at(1);
+                    newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
+                } else if (rightValue === "") {
+                    newInputDisplayText = "0";
+                    rightValue = null;
+                }else {
+                    newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
+                }
+            }
         } else if (value === "clear") {
             resetCalculator();
             newInputDisplayText = "0";
@@ -333,7 +360,8 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("equals"));
     document.querySelector("#clear")
             .addEventListener("click", () => writeToDisplay("clear"));
-    
+    document.querySelector("#backspace")
+            .addEventListener("click", () => writeToDisplay("remove-last-digit"));
 }
 
 function initialize() {
