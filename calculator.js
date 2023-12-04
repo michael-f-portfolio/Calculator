@@ -83,6 +83,8 @@ function operate(operator, num1, num2) {
             throw "Cannot divide by zero";
     } else if (operator === "Mod") {
         result = mod(num1, num2);
+        if (!isNumber(result))
+            throw "Cannot modulate zero";
     } else if (operator === "square") {
         result = square(num1);
         if (result === Infinity || (hasResult && result === 0)) 
@@ -136,7 +138,7 @@ function writeToDisplay(value) {
             if (`${result}`.includes("e")) {
                 throw "Number is out of bounds";
             } else {
-                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                newInputDisplayText = formatDisplayText(`${result}`)
             }
             leftValue = result;
         } else if (value === "square" && leftValue !== null) {
@@ -145,7 +147,7 @@ function writeToDisplay(value) {
                 newCalculationDisplayText = `${leftValue} ${operator} sqr(${rightValue}) = `;
                 leftValue = result;
                 rightValue = null;
-                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                newInputDisplayText = formatDisplayText(`${result}`);
             } else {
                 if (originalLeftValue === null) {
                     originalLeftValue = leftValue
@@ -156,7 +158,7 @@ function writeToDisplay(value) {
                 if (`${result}`.includes("e")) {
                     newInputDisplayText = `${result}`;
                 } else {
-                    newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                    newInputDisplayText = formatDisplayText(`${result}`)
                 }
             }
         } else if (value === "square-root" && leftValue !== null) {
@@ -165,7 +167,7 @@ function writeToDisplay(value) {
                 newCalculationDisplayText = `${leftValue} ${operator} √(${rightValue}) = `;
                 leftValue = result;
                 rightValue = null;
-                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                newInputDisplayText = formatDisplayText(`${result}`);
               } else {
                 if (originalLeftValue === null) {
                     originalLeftValue = leftValue;
@@ -173,7 +175,7 @@ function writeToDisplay(value) {
                 result = calculate(value, leftValue);
                 leftValue = result;
                 newCalculationDisplayText = originalLeftValue = `√(${originalLeftValue})`;
-                newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
+                newInputDisplayText = formatDisplayText(`${result}`);
               }
         } else if (value === "remove-last-digit") {
             if (rightValue === null && leftValue !== null) {
