@@ -40,6 +40,8 @@ let rightValueAsString = null;
 
 // Other Variables
 let hasResult = false;
+let storedValue = null;
+let storedValueAsString = null;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -247,6 +249,20 @@ function writeToDisplay(value) {
                 rightValueAsString = workingValueObj.workingValueAsString;
                 newInputDisplayText = formatDisplayText(rightValueAsString);
             }
+        } else if (value === "memory-recall") {
+            if (storedValue !== null) {
+                if (operator === null) {
+                    // No operator so we're inserting the stored value into the left value
+                    leftValue = storedValue;
+                    leftValueAsString = storedValueAsString;
+                    newInputDisplayText = formatDisplayText(leftValueAsString);
+                } else {
+                    // There is an operator, so we're inserting the stored value into the right value
+                    rightValue = storedValue;
+                    rightValueAsString = storedValueAsString;
+                    newInputDisplayText = formatDisplayText(rightValueAsString);
+                }
+            }
         }
     } catch (e) {
         clearCalculator();
@@ -328,6 +344,17 @@ function appendNumberToWorkingValue(valueToAppend, workingValue, workingValueAsS
     }
 }
 
+function memoryStore() {
+    if (rightValue !== null) {
+        storedValue = rightValue;
+        storedValueAsString = rightValueAsString;
+    } else if (operator === null || hasResult) {
+        storedValue = leftValue;
+        storedValueAsString = leftValueAsString;
+    }
+}
+
+// Display
 function formatDisplayText(inputDisplayText) {
     if (inputDisplayText === null) {
         return "0";
@@ -393,6 +420,7 @@ function shrinkDisplayFontSize(displayElement) {
     }   
 }
 
+// Helpers
 function doesNotExceedDecimalMaxLength(valueWithDecimal) {
     let decimals = valueWithDecimal.split(".").at(1);
     return decimals.length < DECIMAL_MAX_LENGTH;
@@ -458,6 +486,10 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("clear"));
     document.querySelector("#backspace")
             .addEventListener("click", () => writeToDisplay("remove-last-digit"));
+    document.querySelector("#memory-store")
+            .addEventListener("click", () => memoryStore());
+    document.querySelector("#memory-recall")
+            .addEventListener("click", () => writeToDisplay("memory-recall"));
 }
 
 function initialize() {

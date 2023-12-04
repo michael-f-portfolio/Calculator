@@ -180,7 +180,8 @@ body {
 }
 
 #display {
-    background-color: #323232;
+    background-color: #444444;
+    border-radius: 10px;
     white-space: nowrap;
 }
 
