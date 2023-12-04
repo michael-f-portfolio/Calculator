@@ -494,8 +494,73 @@ function addCalculatorEvents() {
             .addEventListener("click", () => writeToDisplay("memory-recall"));
 }
 
+function addKeyboardEvents() {
+    document.addEventListener("keydown", (event) =>{
+        const keyName = event.key;
+        switch (keyName) {
+            case "1":
+                writeToDisplay("1");
+                break;
+            case "2":
+                writeToDisplay("2");
+                break;
+            case "3":
+                writeToDisplay("3");
+                break;
+            case "4":
+                writeToDisplay("4");
+                break;
+            case "5":
+                writeToDisplay("5");
+                break;
+            case "6":
+                writeToDisplay("6");
+                break;
+            case "7":
+                writeToDisplay("7");
+                break;
+            case "8":
+                writeToDisplay("8");
+                break;
+            case "9":
+                writeToDisplay("9");
+                break;
+            case "0":
+                writeToDisplay("0");
+                break;
+            case ".":
+                writeToDisplay("append-decimal");
+                break;
+            case "+":
+                writeToDisplay("+");
+                break;
+            case "-":
+                writeToDisplay("-");
+                break;
+            case "*":
+                writeToDisplay("*");
+                break;
+            case "/":
+                event.preventDefault();
+                writeToDisplay("/");
+                break;
+            case "Enter":
+                writeToDisplay("equals");
+                break;
+            case "Escape":
+                writeToDisplay("clear");
+                break;
+            case "Backspace":
+                writeToDisplay("remove-last-digit");
+            default:
+                break;
+        }
+    });
+}
+
 function initialize() {
     addCalculatorEvents();
+    addKeyboardEvents();
 }
 
 initialize();
