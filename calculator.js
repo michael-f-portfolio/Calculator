@@ -12,21 +12,17 @@
  *      Attempting to divide by zero.
  *      Squaring very large numbers or very small numbers.
  * TODO:
- * Implement Memory Store and Memory Clear functions which...
- *      Will store the current value in the input display by pressing "MS".
- *      Will input the stored value into input display by pressing "MR".
- *      "Clear" will not remove the stored value.
- * Implement ability to use keyboard to input values.
- * Break up equals, square and square-root into a single function since they're all pretty similar.
+ *      Implement ability to use keyboard to input values.
+ *      Break up equals, square and square-root into a single function since they're all pretty similar.
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
  * the text to go out of bounds of it's container.
  */
 // Constants
-const DECIMAL_MAX_LENGTH = 15;
-const RESULT_MAX_LENGTH = 21;
+const DECIMAL_MAX_LENGTH = 13;
+const RESULT_MAX_LENGTH = 15;
 const inputNumberFormat = {
-    maximumSignificantDigits: DECIMAL_MAX_LENGTH
+    maximumFractionDigits: DECIMAL_MAX_LENGTH
 }
 
 // Calculation Variables
@@ -327,6 +323,12 @@ function appendNumberToWorkingValue(valueToAppend, workingValue, workingValueAsS
     } else {
         if (workingValueAsString === null) {
             workingValueAsString = `${workingValue}`;
+        }
+        if (workingValueAsString.length > RESULT_MAX_LENGTH) {
+            return {
+                workingValue: workingValue,
+                workingValueAsString: workingValueAsString
+            };
         }
         if (workingValueAsString.includes(".")) {
             workingValueAsString = `${workingValueAsString}${valueToAppend}`
