@@ -269,7 +269,7 @@ function removeLastDigitFromWorkingValue(workingValueAsString) {
     if (workingValueAsString === "" || workingValueAsString === "-") {
         return {
             workingValue: null,
-            workingValueAsString: "0"
+            workingValueAsString: null
         };
     } else {
         return {
