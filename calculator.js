@@ -5,9 +5,12 @@
  * 
  * Responsive calculator application which allows the user to Add, Subtract, Multiply and Divide.
  * Features include: 
- * Responsiveness
- * Error handling for erroneous operations 
- * 
+ * Display screen resizes numbers to always fit in the display.
+ * Somewhat responsive based on screen size.
+ * Error messages for:
+ *      Will throw an out of bounds error if result is in scientific notation.
+ *      Attempting to divide by zero.
+ *      Squaring very large numbers or very small numbers.
  * TODO:
  * Implement Memory Store and Memory Clear functions which...
  *      Will store the current value in the input display by pressing "MS".
@@ -18,7 +21,6 @@
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
  * the text to go out of bounds of it's container.
- * 1/9
  */
 // Constants
 const DECIMAL_MAX_LENGTH = 15;
@@ -30,12 +32,13 @@ const inputNumberFormat = {
 // Calculation Variables
 let leftValue = null;
 let originalLeftValue = null;
+let leftValueAsString = null;
 let operator = null;
 let rightValue = null;
 let originalRightValue = null;
+let rightValueAsString = null;
 
 // Other Variables
-let appendToValue = false;
 let hasResult = false;
 
 function add(num1, num2) {
@@ -90,13 +93,12 @@ function operate(operator, num1, num2) {
     return result;
 }
 
-function resetCalculator() {
+function clearCalculator() {
     leftValue = null;
     operator = null;
     rightValue = null;
     originalLeftValue = null;
     originalRightValue = null;
-    appendToValue = false;
     hasResult = false;
 }
 
@@ -104,15 +106,6 @@ function calculate(operator, leftValue, rightValue) {
     let result = operate(operator, parseFloat(leftValue), parseFloat(rightValue));
     hasResult = true;
     return result;
-    // if (!`${result}`.includes(".") || `${result}`.includes("e")) {
-    //     return result;
-    // } else {
-    //     if (decimalIsAtMostDecimalMaxLength(`${result}`) ) {
-    //         return result;
-    //     } else {
-    //         return parseFloat(result.toFixed(DECIMAL_MAX_LENGTH));
-    //     }
-    // }
 }
 
 function writeToDisplay(value) {
@@ -133,7 +126,7 @@ function writeToDisplay(value) {
             } else if (originalRightValue !== null) {
                 result = calculate(operator, parseFloat(leftValue), parseFloat(originalRightValue));
                 newCalculationDisplayText = `${leftValue} ${operator} ${originalRightValue} =`;
-            }else {
+            } else {
                 if (originalLeftValue === null) {
                     originalLeftValue = leftValue;
                 }
@@ -141,12 +134,11 @@ function writeToDisplay(value) {
                 newCalculationDisplayText = `${leftValue} ${operator} ${originalLeftValue} =`;
             }
             if (`${result}`.includes("e")) {
-                newInputDisplayText = `${result}`;
+                throw "Number is out of bounds";
             } else {
                 newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
             }
             leftValue = result;
-            appendToValue = false;
         } else if (value === "square" && leftValue !== null) {
             if (rightValue !== null) {
                 result = calculate(operator, leftValue, calculate(value, rightValue));
@@ -160,7 +152,6 @@ function writeToDisplay(value) {
                 }
                 result = calculate(value, leftValue);
                 leftValue = result;
-                appendToValue = false;
                 newCalculationDisplayText = originalLeftValue = `sqr(${originalLeftValue})`;
                 if (`${result}`.includes("e")) {
                     newInputDisplayText = `${result}`;
@@ -181,75 +172,55 @@ function writeToDisplay(value) {
                 }
                 result = calculate(value, leftValue);
                 leftValue = result;
-                appendToValue = false;
                 newCalculationDisplayText = originalLeftValue = `√(${originalLeftValue})`;
                 newInputDisplayText = result.toLocaleString("en-US", inputNumberFormat);
               }
         } else if (value === "remove-last-digit") {
             if (rightValue === null && leftValue !== null) {
-                leftValue = leftValue.slice(0, leftValue.length -1);
-                if (leftValue.includes(".")) {
-                    let intValue = leftValue.split(".").at(0);
-                    let decimalValue = leftValue.split(".").at(1);
-                    newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                } else if (leftValue === "" || leftValue === "-") {
-                    newInputDisplayText = "0";
-                    leftValue = null;
-                    appendToValue = false;
-                 } else {
-                    newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
-                }
+                const workingValueObj = removeLastDigitFromWorkingValue(leftValueAsString);
+                leftValue = workingValueObj.workingValue;
+                leftValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(leftValueAsString);
             } else if (rightValue !== null && !hasResult) {
-                rightValue = rightValue.slice(0, rightValue.length -1);
-                if (rightValue.includes(".")) {
-                    let intValue = rightValue.split(".").at(0);
-                    let decimalValue = rightValue.split(".").at(1);
-                    newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                } else if (rightValue === "" || rightValue === "-") {
-                    newInputDisplayText = "0";
-                    rightValue = "0";
-                }else {
-                    newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
-                }
+                const workingValueObj = removeLastDigitFromWorkingValue(rightValueAsString);
+                rightValue = workingValueObj.workingValue;
+                rightValueAsString= workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(rightValueAsString);
             }
         } else if (value === "clear") {
-            resetCalculator();
+            clearCalculator();
             newInputDisplayText = "0";
             newCalculationDisplayText = ""; 
         } else if (value === "invert") {
-            let valueToInvert;
-            if ((leftValue !== null && operator === null) || 
-                    (rightValue !== null && appendToValue === false) ||
-                    originalLeftValue !== null) {
-                valueToInvert = parseFloat(leftValue);
-                leftValue = valueToInvert *= -1;
-                newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
-            } else if (rightValue !== null) {
-                valueToInvert = parseFloat(rightValue); 
-                rightValue = valueToInvert *= -1;
-                newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
+            if (operator === null && leftValue !== null) {
+                // No operator so we're working with the left value
+                const workingValueObj = invertWorkingValue(leftValue);
+                leftValue = workingValueObj.workingValue;
+                leftValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(leftValueAsString);
+            } else {
+                // There is an operator, so we're working with the right value
+                const workingValueObj = invertWorkingValue(rightValue);
+                rightValue = workingValueObj.workingValue;
+                rightValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(rightValueAsString);
             }
         } else if (value === "append-decimal") {
             if (operator === null) {
-                if (leftValue === null) {
-                    leftValue = "0.";
-                    appendToValue = true;
-                    newInputDisplayText = leftValue;
-                } else if (!leftValue.includes(".")) {
-                    leftValue = `${leftValue}.`;
-                    newInputDisplayText = `${parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat)}.` ;
-                }
+                // No operator so we're working with the left value
+                const workingValueObj = appendDecimalToWorkingValue(leftValue);
+                leftValue = workingValueObj.workingValue;
+                leftValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(leftValueAsString);
             } else {
-                if (rightValue === null) {
-                    rightValue = "0.";
-                    newInputDisplayText = rightValue;
-                } else if (!rightValue.includes(".")) {
-                    rightValue = `${rightValue}.`;
-                    newInputDisplayText = `${parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat)}.`;
-                }
+                // There is an operator, so we're working with the right value
+                const workingValueObj = appendDecimalToWorkingValue(rightValue);
+                rightValue = workingValueObj.workingValue;
+                rightValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(rightValueAsString);
             }
         } else if (isOperator(value)) {
-            if (leftValue !== null && rightValue != null) {
+            if (rightValue !== null) {
                 result = calculate(operator, leftValue, rightValue);
                 leftValue = result;
                 rightValue = null;
@@ -262,54 +233,109 @@ function writeToDisplay(value) {
             } 
         } else if (isNumber(value)) {
             if (operator === null) {
-                if (appendToValue) {
-                    if (leftValue.includes(".") && decimalIsAtMostDecimalMaxLength(leftValue)) {
-                        leftValue = `${leftValue}${value}`;                        
-                    } else if (!leftValue.includes(".")) {
-                        leftValue = `${leftValue}${value}`;                        
-                    }
-                } else if (value !== "0") {
-                    leftValue = value;
-                    appendToValue = true;
-                }
-                if (leftValue !== null) {
-                    if (leftValue.includes(".")) {
-                        let intValue = leftValue.split(".").at(0);
-                        let decimalValue = leftValue.split(".").at(1);
-                        newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                    } else {
-                        newInputDisplayText = parseFloat(leftValue).toLocaleString("en-US", inputNumberFormat);
-                    }
-                }
+                // No operator so we're working with the left value
+                const workingValueObj = appendNumberToWorkingValue(value, leftValue, leftValueAsString);
+                leftValue = workingValueObj.workingValue;
+                leftValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(leftValueAsString);
             } else {
-                if (rightValue === null && value !== "0") {
-                    rightValue = value;
-                } else if (rightValue !== null) {
-                    if (rightValue.includes(".") && decimalIsAtMostDecimalMaxLength(rightValue)) {
-                        rightValue = `${rightValue}${value}`;                        
-                    } else if (!rightValue.includes(".")) {
-                        rightValue = `${rightValue}${value}`;                        
-                    }
-                }
-                if (rightValue !== null) {
-                    if (rightValue.includes(".")) {
-                        let intValue = rightValue.split(".").at(0);
-                        let decimalValue = rightValue.split(".").at(1);
-                        newInputDisplayText = `${parseFloat(intValue).toLocaleString("en-US", inputNumberFormat)}.${decimalValue}`;
-                    } else {
-                        newInputDisplayText = parseFloat(rightValue).toLocaleString("en-US", inputNumberFormat);
-                    }
-                }
+                // There is an operator, so we're working with the right value
+                const workingValueObj = appendNumberToWorkingValue(value, rightValue, rightValueAsString);
+                rightValue = workingValueObj.workingValue;
+                rightValueAsString = workingValueObj.workingValueAsString;
+                newInputDisplayText = formatDisplayText(rightValueAsString);
             }
         }
     } catch (e) {
-        resetCalculator();
+        clearCalculator();
         newInputDisplayText = e;
         newCalculationDisplayText = ""; 
     }
     inputDisplay.textContent = newInputDisplayText;
     calculationDisplay.textContent = newCalculationDisplayText;
     checkAndSetDisplayFontSize();
+}
+
+function invertWorkingValue(workingValue) {
+    let invertedValue = workingValue *= -1
+    return {
+        workingValue: invertedValue,
+        workingValueAsString: `${invertedValue}`
+    }
+}
+
+function removeLastDigitFromWorkingValue(workingValueAsString) {
+    workingValueAsString = workingValueAsString.slice(0, workingValueAsString.length - 1);
+    if (workingValueAsString === "" || workingValueAsString === "-") {
+        return {
+            workingValue: null,
+            workingValueAsString: "0"
+        };
+    } else {
+        return {
+            workingValue: parseFloat(workingValueAsString),
+            workingValueAsString: workingValueAsString
+        };
+    } 
+}
+
+function appendDecimalToWorkingValue(workingValue) {
+    if (workingValue === null) {
+        return {
+            workingValue: 0,
+            workingValueAsString: "0."
+        };
+    } else {
+        return {
+            workingValue: workingValue,
+            workingValueAsString: `${workingValue}.`
+        };
+    }
+}
+
+function appendNumberToWorkingValue(valueToAppend, workingValue, workingValueAsString) {
+    if (workingValue === null) {
+        if (valueToAppend !== "0") {
+            return { 
+                workingValue: parseInt(valueToAppend),
+                workingValueAsString: valueToAppend 
+            };
+        } else {
+            return {
+                workingValue: null,
+                workingValueAsString: null
+            };
+        }
+    } else {
+        if (workingValueAsString === null) {
+            workingValueAsString = `${workingValue}`;
+        }
+        if (workingValueAsString.includes(".")) {
+            workingValueAsString = `${workingValueAsString}${valueToAppend}`
+            return {
+                workingValue: parseFloat(workingValueAsString),
+                workingValueAsString: workingValueAsString
+            };
+        } else {
+            workingValueAsString = `${workingValue}${valueToAppend}`;
+            return { 
+                workingValue: parseInt(workingValueAsString),
+                workingValueAsString: workingValueAsString
+            };
+        }
+    }
+}
+
+function formatDisplayText(inputDisplayText) {
+    if (inputDisplayText === null) {
+        return "0";
+    } else if (inputDisplayText.includes(".")) {
+        let integers = inputDisplayText.split(".").at(0);
+        let decimals = inputDisplayText.split(".").at(1);
+        return `${parseInt(integers).toLocaleString("en-US", inputNumberFormat)}.${decimals}`;
+    } else {
+        return parseInt(inputDisplayText).toLocaleString("en-US", inputNumberFormat);
+    }
 }
 
 function checkAndSetDisplayFontSize() {
@@ -365,7 +391,7 @@ function shrinkDisplayFontSize(displayElement) {
     }   
 }
 
-function decimalIsAtMostDecimalMaxLength(valueWithDecimal) {
+function doesNotExceedDecimalMaxLength(valueWithDecimal) {
     let decimals = valueWithDecimal.split(".").at(1);
     return decimals.length < DECIMAL_MAX_LENGTH;
 }
