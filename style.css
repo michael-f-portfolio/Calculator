@@ -2,23 +2,27 @@
 @media screen and (min-width: 1920px){
     #calculator {
         width: 20vw;
-        height: 32vw;
+        height: 33vw;
     }
 
     #display {
         width: 18vw;
         height: 5vw;
         margin-top: 1vw;
+        margin-bottom: 0.5vw;
         font-size: 4vw;
         gap: 0.5vw;
     }
 
     #calculation-display {
         font-size: 1.25vw;
+        margin-right: 0.25vw;
+
     }
 
     #input-display {
         font-size: 2.5vw;
+        margin-right: 0.25vw;
     }
 
     #input {
@@ -36,22 +40,25 @@
 @media screen and (min-width: 1080px) and (max-width: 1919px){
     #calculator {
         width: 20vw;
-        height: 33vw;
+        height: 34vw;
     }
 
     #display {
         width: 18vw;
         height: 5vw;
         margin-top: 1vw;
+        margin-bottom: 0.5vw;
         gap: .25vw;
     }
 
     #calculation-display {
         font-size: 1vw;
+        margin-right: 0.5vw;
     }
 
     #input-display {
         font-size: 3vw;
+        margin-right: 0.5vw;
     }
 
     #input {
@@ -66,26 +73,30 @@
     }
 }
 
-@media screen and (min-width: 600px) and (max-width: 1080px){
+@media screen and (min-width: 600px) and (max-width: 1079px){
     #calculator {
         width: 40vw;
-        height: 65vw;
+        height: 66vw;
     }
 
     #display {
         width: 35vw;
-        height: 10vw;
+        height: 11vw;
         margin-top: 2vw;
+        margin-bottom: 1vw;
         font-size: 6vw;
         gap: .5vw;
     }
 
     #calculation-display {
         font-size: 3vw;
+        margin-right: 1vw;
+        
     }
 
     #input-display {
         font-size: 6vw;
+        margin-right: 1vw;
     }
 
     #input {
@@ -100,25 +111,28 @@
     }
 }
 
-@media screen and (max-width:600px) {
+@media screen and (max-width:599px) {
     #calculator {
         width: 75vw;
-        height: 125vw;
+        height: 127vw;
     }
 
     #display {
         width: 70vw;
         height: 20vw;
         margin-top: 2vw;
+        margin-bottom: 2vw;
         gap: 2vw;
     }
 
     #calculation-display {
         font-size: 5vw;
+        margin-right: 2vw;
     }
 
     #input-display {
         font-size: 10vw;
+        margin-right: 2.5vw;
     }
 
     #input {
