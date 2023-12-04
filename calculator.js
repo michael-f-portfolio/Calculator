@@ -17,7 +17,7 @@
  *      Will input the stored value into input display by pressing "MR".
  *      "Clear" will not remove the stored value.
  * Implement ability to use keyboard to input values.
- * Break up repetitive code blocks into their own functions DRY DRY DRY
+ * Break up equals, square and square-root into a single function since they're all pretty similar.
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
  * the text to go out of bounds of it's container.
@@ -150,7 +150,7 @@ function writeToDisplay(value) {
                 newInputDisplayText = formatDisplayText(`${result}`);
             } else {
                 if (originalLeftValue === null) {
-                    originalLeftValue = leftValue
+                    originalLeftValue = leftValue;
                 }
                 result = calculate(value, leftValue);
                 leftValue = result;
@@ -178,7 +178,7 @@ function writeToDisplay(value) {
                 newInputDisplayText = formatDisplayText(`${result}`);
               }
         } else if (value === "remove-last-digit") {
-            if (rightValue === null && leftValue !== null) {
+            if (operator === null && leftValue !== null) {
                 const workingValueObj = removeLastDigitFromWorkingValue(leftValueAsString);
                 leftValue = workingValueObj.workingValue;
                 leftValueAsString = workingValueObj.workingValueAsString;
@@ -259,11 +259,11 @@ function writeToDisplay(value) {
 }
 
 function invertWorkingValue(workingValue) {
-    let invertedValue = workingValue *= -1
+    let invertedValue = workingValue *= -1;
     return {
         workingValue: invertedValue,
         workingValueAsString: `${invertedValue}`
-    }
+    };
 }
 
 function removeLastDigitFromWorkingValue(workingValueAsString) {
