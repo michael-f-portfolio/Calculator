@@ -138,7 +138,7 @@ function writeToDisplay(value) {
             if (`${result}`.includes("e")) {
                 throw "Number is out of bounds";
             } else {
-                newInputDisplayText = formatDisplayText(`${result}`)
+                newInputDisplayText = formatDisplayText(`${result}`);
             }
             leftValue = result;
         } else if (value === "square" && leftValue !== null) {
@@ -158,7 +158,7 @@ function writeToDisplay(value) {
                 if (`${result}`.includes("e")) {
                     newInputDisplayText = `${result}`;
                 } else {
-                    newInputDisplayText = formatDisplayText(`${result}`)
+                    newInputDisplayText = formatDisplayText(`${result}`);
                 }
             }
         } else if (value === "square-root" && leftValue !== null) {
