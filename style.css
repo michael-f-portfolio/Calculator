@@ -1,12 +1,12 @@
 /* Structure */
 @media screen and (min-width: 1920px){
     #calculator {
-        width: 20vw;
+        width: 19vw;
         height: 33vw;
     }
 
     #display {
-        width: 18vw;
+        width: 17vw;
         height: 5vw;
         margin-top: 1vw;
         margin-bottom: 0.5vw;
@@ -17,12 +17,13 @@
     #calculation-display {
         font-size: 1.25vw;
         margin-right: 0.25vw;
-
+        padding-left: 0.25vw;
     }
 
     #input-display {
         font-size: 2.5vw;
         margin-right: 0.25vw;
+        padding-left: 0.25vw;
     }
 
     #input {
@@ -54,11 +55,13 @@
     #calculation-display {
         font-size: 1vw;
         margin-right: 0.5vw;
+        padding-left: 0.5vw;
     }
 
     #input-display {
         font-size: 3vw;
         margin-right: 0.5vw;
+        padding-left: 0.5vw;
     }
 
     #input {
@@ -91,12 +94,13 @@
     #calculation-display {
         font-size: 3vw;
         margin-right: 1vw;
-        
+        padding-right: 1vw;
     }
 
     #input-display {
         font-size: 6vw;
         margin-right: 1vw;
+        padding-right: 1vw;
     }
 
     #input {
@@ -128,11 +132,13 @@
     #calculation-display {
         font-size: 5vw;
         margin-right: 2vw;
+        padding-right: 2vw;
     }
 
     #input-display {
         font-size: 10vw;
         margin-right: 2.5vw;
+        padding-right: 2.5vw;
     }
 
     #input {
@@ -147,7 +153,13 @@
     }
 }
 
+@font-face {
+    font-family: digital-seven;
+    src: url(fonts/Digital7-rg1mL.ttf);
+}
+
 body {
+    font-family: digital-seven;
     display: flex;
     justify-content: center;
     background-color: #b1aeab;
