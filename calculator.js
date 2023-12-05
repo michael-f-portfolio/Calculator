@@ -12,15 +12,17 @@
  *      Attempting to divide by zero.
  *      Squaring very large numbers or very small numbers.
  * TODO:
- *      Implement ability to use keyboard to input values.
+ *      Recolor memory recall if a value is stored
+ *      "Disable" action buttons if an error occurs showing only inputs which are valid
  *      Break up equals, square and square-root into a single function since they're all pretty similar.
  * BUGS:
  * Resizing the window while a large value is in either the input display or calculation display can cause 
- * the text to go out of bounds of it's container.
+ * the text to go out of bounds of it's container. (add a timeout on the event so resize doesn't lag)
+ * Add more increments of font-size% so text resizing fits better (not too small, maybe switch to vw instead)
  */
 // Constants
-const DECIMAL_MAX_LENGTH = 13;
-const RESULT_MAX_LENGTH = 15;
+const DECIMAL_MAX_LENGTH = 16;
+const RESULT_MAX_LENGTH = 18;
 const inputNumberFormat = {
     maximumFractionDigits: DECIMAL_MAX_LENGTH
 }
